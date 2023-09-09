@@ -1,4 +1,6 @@
 const BASE_URL = 'https://api.thecatapi.com/v1/';
+const API_KEY =
+  'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
 
 // Выберите элемент <select> с классом "breed-select"
 const breedSelect = document.querySelector('.breed-select');
