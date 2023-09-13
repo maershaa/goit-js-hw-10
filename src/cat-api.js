@@ -5,7 +5,7 @@ import { createMarkup } from './markup.js';
 axios.defaults.headers.common['x-api-key'] =
   'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
 
-import { BASE_URL } from './index';
+import { BASE_URL } from './index.js';
 
 const refs = {
   breedSelect: document.querySelector('.breed-select'),

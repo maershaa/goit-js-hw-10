@@ -3,6 +3,7 @@ import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
 import { createMarkup } from './markup.js';
 
 const BASE_URL = 'https://api.thecatapi.com/v1/';
+
 const refs = {
   breedSelect: document.querySelector('.breed-select'),
   loader: document.querySelector('.loader'),
