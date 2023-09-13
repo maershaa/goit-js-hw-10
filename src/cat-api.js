@@ -1,94 +1,110 @@
-export { fetchBreeds };
-
-import { fetchBreeds } from './cat-api';
-
-// Вы импортируете библиотеку axios для выполнения HTTP-запросов.
 import axios from 'axios';
+import { createMarkup } from './markup.js';
 
+// Установим заголовок для всех запросов с ключом доступа
 axios.defaults.headers.common['x-api-key'] =
   'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
 
-import { TheCatAPI } from '@thatapicompany/thecatapi';
+import { BASE_URL } from './index';
 
-const BASE_URL = 'https://api.thecatapi.com/v1/breeds';
-// нам не нужен const API_KEY так как
-// const API_KEY =
-//   'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
-// poroda = 000.cuttentTarget.value
+const refs = {
+  breedSelect: document.querySelector('.breed-select'),
+  loader: document.querySelector('.loader'),
+  error: document.querySelector('.error'),
+  catInfo: document.querySelector('.cat-info'),
+};
 
-// Выберите элемент <select> с классом "breed-select"
-const breedSelect = document.querySelector('.breed-select');
+// Определение функции fetchBreeds для получения данных о породах
+function fetchBreeds(refs, idValue) {
+  // Выполняем GET-запрос для получения списка пород
+  return axios.get(`${BASE_URL}breeds`).then(response => {
+    // Разбор ответа сервера
+    const catArr = response.data;
 
-// Выберите элемент <p> с классом "loader"
-const loader = document.querySelector('.loader');
+    // Очищаем селект от предыдущих опций
+    refs.breedSelect.innerHTML = '';
 
-// Выберите элемент <p> с классом "error"
-const error = document.querySelector('.error');
+    // Создаем опции для выбора породы
+    catArr.forEach(({ id, name, image }) => {
+      if (!image) return;
 
-// Выберите элемент <div> с классом "cat-info"
-const catInfo = document.querySelector('.cat-info');
+      const option = document.createElement('option');
+      option.value = id;
+      option.innerHTML = name;
 
-breedSelect.addEventListener('change', onClick);
-
-function onClick(evt) {
-  // нужно ли?
-  evt.preventDefault();
-
-  const poroda = evt.currentTarget.value; // Получить выбранное значение из выпадающего списка
-
-  fetchBreeds(poroda)
-    .then(data => (list.innerHTML = createMarkup(data.forecast.forecastday)))
-    .catch(err => console.log(err));
+      // Добавляем созданную опцию в селект
+      refs.breedSelect.appendChild(option);
+    });
+  });
 }
 
-loader.setAttribute.style.display = 'none';
-error.setAttribute.style.display = 'none';
-
-function fetchBreeds(poroda) {
-  // const poroda = breedSelect.value; // Получить выбранное значение из выпадающего списка
-  axios
-    .get(BASE_URL)
-    .then(resp => {
-      if (!resp.ok) {
-        throw new Error(resp.statusText);
-        loader.setAttribute('hidden', false);
-      }
-      return resp.json();
-    })
-    .then(data => {
-      loader.setAttribute('hidden', false);
-
-      // Очистите существующие опции, если они есть
-      breedSelect.innerHTML = '';
-
-      // Создайте и добавьте опции на основе данных
-      data.forEach(breed => {
-        const option = document.createElement('option');
-        option.value = breed.id; // Значение опции - ID породы
-        option.textContent = breed.name; // Текст опции - название породы
-        breedSelect.appendChild(option);
-
-        // Вызовите функцию createMarkup с данными в качестве аргумента и вставьте разметку в catInfo
-        const markup = createMarkup(data);
-        catInfo.insertAdjacentHTML('beforeend', markup);
-      });
-    })
-    .catch(error => {
-      error.setAttribute('hidden', true);
+// Определение функции fetchCatByBreed для получения данных о коте по породе
+function fetchCatByBreed(breedId) {
+  // Выполняем запрос на получение информации о коте по идентификатору породы
+  return axios
+    .get(`${BASE_URL}images/search?breed_ids=${breedId}`)
+    .then(response => {
+      // Обработка данных о коте и возврат промиса с результатами
+      const catData = response.data[0]; // Выбираем первый элемент массива, так как запрос возвращает массив
+      return catData;
     });
 }
 
-function createMarkup(arr) {
-  return arr
-    .map(({ url, width, height, breeds: { name, temperament } }) => {
-      return `<ul>
-  <li>
-    <img src="${url}" alt="${name}" width="${width}" height="${height}">
-    <h1> ${name} </h1>
-    <p></p>
-    <p><span style="font-weight: bold"> Temperament:</span> ${temperament}</p>
-  </li>
-</ul>`;
-    })
-    .join('');
-}
+export { fetchBreeds, fetchCatByBreed };
+
+// import { BASE_URL, refs, createMarkup, onChoose } from './index';
+// import axios from 'axios';
+// axios.defaults.headers.common['x-api-key'] =
+//   'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
+
+// // Определите функцию fetchBreeds для получения данных о породах
+// function fetchBreeds(idValue) {
+//   axios
+//     .get(`${BASE_URL}breeds`)
+//     .then(response => {
+//       // Обычно при успешном запросе (HTTP-код 200) не требуется проверять response.ok, так как .then обработает только успешные ответы.
+//       const catArr = response.data;
+//       refs.breedSelect.innerHTML = '';
+
+//       catArr.forEach(({ id, name, image }) => {
+//         if (!image) return;
+
+//         const option = document.createElement('option');
+//         option.value = id;
+//         option.innerHTML = name;
+//         refs.breedSelect.appendChild(option);
+
+//         fetchCatByBreed(0);
+//         console.log(fetchCatByBreed(0));
+//       });
+//     })
+//     .catch(error => {
+//       console.error(error);
+//       refs.catInfo.innerHTML = 'Выбранная порода недоступна.';
+//     })
+//     .finally(response => {
+//       refs.loader.hidden = true;
+//     });
+// }
+// function fetchCatByBreed(breedId) {
+//   axios
+//     .get(`${BASE_URL}images/search?breed_ids=${breedId}`)
+//     .then(response => {
+//       console.log(response);
+//       if (breedId >= 0 && breedId < catArr.length) {
+//         const selectedBreed = catArr[idValue];
+//         // Теперь у вас есть selectedBreed, и вы можете выполнить дополнительные действия с ним
+//         const markup = createMarkup(selectedBreed);
+//         refs.catInfo.innerHTML = markup;
+//       }
+//     })
+//     .catch(error => {
+//       console.error(error);
+//       refs.catInfo.innerHTML = 'Выбранная порода недоступна.';
+//     })
+//     .finally(response => {
+//       refs.loader.hidden = true;
+//     });
+// }
+
+// export { fetchBreeds, fetchCatByBreed, selectedBreed };

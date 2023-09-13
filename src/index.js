@@ -1,77 +1,117 @@
+import SlimSelect from 'slim-select';
+import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import { createMarkup } from './markup.js';
+
 const BASE_URL = 'https://api.thecatapi.com/v1/';
-const API_KEY =
-  'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
+const refs = {
+  breedSelect: document.querySelector('.breed-select'),
+  loader: document.querySelector('.loader'),
+  error: document.querySelector('.error'),
+  catInfo: document.querySelector('.cat-info'),
+};
 
-// Выберите элемент <select> с классом "breed-select"
-const breedSelect = document.querySelector('.breed-select');
+refs.loader.hidden = true;
+refs.error.hidden = true;
 
-// Выберите элемент <p> с классом "loader"
-const loader = document.querySelector('.loader');
-
-// Выберите элемент <p> с классом "error"
-const error = document.querySelector('.error');
-
-// Выберите элемент <div> с классом "cat-info"
-const catInfo = document.querySelector('.cat-info');
-
-// Добавьте обработчик события "change" к элементу breedSelect
-breedSelect.addEventListener('change', onChoose);
-
-// Определите функцию onChoose, которая будет вызываться при выборе породы
-function onChoose(evt) {
-  const selectedValue = evt.target.value; // Получить выбранное значение из элемента breedSelect
-  fetchBreeds(selectedValue); // Вызвать функцию fetchBreeds с выбранным значением
-}
-
-// Определите функцию fetchBreeds для получения данных о породах
-function fetchBreeds(idValue) {
-  // Запрос на получение пород с использованием fetch
-  const listPromise = fetch(`${BASE_URL}breeds?x-api-key=${API_KEY}`);
-  listPromise
-    .then(response => response.json()) // Преобразование ответа в JSON
-    .then(catArr => {
-      // Очистить список пород перед добавлением новых значений
-      breedSelect.innerHTML = '';
-
-      for (let i = 0; i < catArr.length; i++) {
-        const breed = catArr[i];
-
-        // Отфильтровать породы без изображения
-        if (!breed.image) continue;
-
-        // Создать новый элемент option для каждой породы и добавить его в список
-        const option = document.createElement('option');
-        option.value = i;
-        option.innerHTML = breed.name;
-        breedSelect.appendChild(option);
-      }
-
-      // Проверить, что idValue валидно и выбрать первую породу по умолчанию
-      if (idValue >= 0 && idValue < catArr.length) {
-        const selectedBreed = catArr[idValue];
-        const markup = createMarkup(selectedBreed);
-        catInfo.innerHTML = markup;
-      } else {
-        // Если idValue недопустимо, вы можете сделать здесь обработку по умолчанию или ничего не делать
-      }
+// Инициализация начальной загрузки пород при загрузке страницы
+fetchBreeds().then(() => {
+  const selectedValue = refs.breedSelect.value;
+  fetchCatByBreed(selectedValue)
+    .then(catData => {
+      // Генерация разметки и обновление информации о коте
+      const markup = createMarkup(catData);
+      refs.catInfo.innerHTML = markup;
     })
     .catch(error => {
       console.error(error);
+      refs.catInfo.innerHTML = 'Выбранная порода недоступна.';
+    });
+});
+
+refs.breedSelect.addEventListener('change', onChoose);
+
+// Определение функции onChoose, которая вызывается при выборе породы
+function onChoose(evt) {
+  const selectedValue = evt.target.value;
+  refs.loader.hidden = false; // Показываем loader перед запросом
+  fetchCatByBreed(selectedValue)
+    .then(catData => {
+      // Генерация разметки и обновление информации о коте
+      const markup = createMarkup(catData);
+      refs.catInfo.innerHTML = markup;
+    })
+    .catch(error => {
+      console.error(error);
+      refs.catInfo.innerHTML = 'Выбранная порода недоступна.';
+    })
+    .finally(response => {
+      refs.loader.hidden = true; // Скрываем loader после запроса
     });
 }
 
-// Инициировать начальную загрузку пород при загрузке страницы
-fetchBreeds(0);
+// import SlimSelect from 'slim-select';
+// import axios from 'axios';
+// import { fetchBreeds, fetchCatByBreed } from './cat-api';
 
-// Определите функцию createMarkup для создания разметки породы
-function createMarkup(breed) {
-  const { url, width, height, name, temperament } = breed;
-  return `<ul>
-    <li>
-      <img src="${url}" alt="${name}" width="${width}" height="${height}">
-      <h1>${name}</h1>
-      <p></p>
-      <p><span style="font-weight: bold"> Temperament:</span> ${temperament}</p>
-    </li>
-  </ul>`;
-}
+// axios.defaults.headers.common['x-api-key'] =
+//   'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
+
+// // new SlimSelect({
+// //   select: '#selectElement',
+// // });
+
+// const BASE_URL = 'https://api.thecatapi.com/v1/';
+// // const API_KEY =
+// //   'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
+// const refs = {
+//   // Выберите элемент <select> с классом "breed-select"
+//   breedSelect: document.querySelector('.breed-select'),
+//   // Выберите элемент <p> с классом "loader"
+//   loader: document.querySelector('.loader'),
+//   // Выберите элемент <p> с классом "error"
+//   error: document.querySelector('.error'),
+//   // Выберите элемент <div> с классом "cat-info"
+//   catInfo: document.querySelector('.cat-info'),
+// };
+
+// refs.loader.hidden = true;
+// refs.error.hidden = true;
+
+// // Пока идет запрос за списком пород, необходимо скрыть select.breed-select и показать p.loader.
+// // Пока идет запрос за инфорацией о коте, необходимо скрыть div.cat-info и показать p.loader.
+// // Когда любой запрос завершился, p.loader необходимо скрыть
+
+// // Инициировать начальную загрузку пород при загрузке страницы
+// fetchBreeds(0);
+
+// refs.breedSelect.addEventListener('change', onChoose);
+
+// // Определите функцию onChoose, которая будет вызываться при выборе породы
+// function onChoose(evt) {
+//   const selectedValue = evt.target.value;
+//   console.log(selectedValue); // Получить выбранное значение из элемента breedSelect
+//   fetchBreeds(selectedValue); // Вызвать функцию fetchBreeds с выбранным значением
+// }
+
+// // Определите функцию createMarkup для создания разметки породы
+// function createMarkup(
+//   arr,
+//   { url, width, height, name, temperament, description }
+// ) {
+//   return arr
+//     .map(({ id, name }) => {
+//       return `<ul>
+//     <li>
+//       <img src="${url}" alt="${name}" width="${width}" height="${height}">
+//       <h1>${name}</h1>
+//       <p>${description}</p>
+//       <p><span style="font-weight: bold"> Temperament:</span> ${temperament}</p>
+//     </li>
+//   </ul>`;
+//     })
+//     .join('');
+// }
+
+// fetchCatByBreed(breedId);
+
+// export { BASE_URL, refs, createMarkup, onChoose };
