@@ -4,8 +4,7 @@ import { createMarkup } from './markup.js';
 // Установим заголовок для всех запросов с ключом доступа
 axios.defaults.headers.common['x-api-key'] =
   'live_m6bWAmbCUpZFpjwTSQIcwzhCw2H822bRJfscfRObrB30g8VI6R23vJzjXH2DXoxA';
-
-import { BASE_URL } from './index.js';
+import { BASE_URL } from './index';
 
 const refs = {
   breedSelect: document.querySelector('.breed-select'),
