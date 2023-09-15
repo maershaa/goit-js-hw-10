@@ -1,0 +1,65 @@
+img {
+  display: block;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.hidden {
+  display: none;
+}
+
+.description {
+  font-size: 22px;
+  font-weight: 400;
+  max-width: 50%;
+}
+
+.title {
+  margin-top: 0;
+}
+
+li {
+  display: flex;
+  column-gap: 18px;
+  flex-wrap: nowrap;
+  justify-content: center; /* Центрирование по горизонтали */
+}
+
+.description-container {
+  /* flex-basis: calc(50% - 9px); /* Ширина элемента в 50% с учетом отступа */
+  /* margin-right: 18px; Отступ между элементами (колонками)
+  /* box-sizing: border-box;  */
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+}
+
+/* Создаем контейнер для центрирования .loader */
+.center-container {
+  display: flex;
+  justify-content: center; /* Центрируем по горизонтали */
+  align-items: center; /* Центрируем по вертикали */
+  min-height: 100vh; /* Минимальная высота, чтобы контейнер заполнил всю видимую область */
+}
+
+.loader {
+  width: 100px;
+  height: 100px;
+  border: 10px solid darkslateblue;
+  border-bottom-color: palevioletred;
+  border-radius: 50%;
+  display: block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
