@@ -6,10 +6,6 @@ ul {
   list-style-type: none;
 }
 
-.hidden {
-  display: none;
-}
-
 .description {
   font-size: 22px;
   font-weight: 400;
@@ -53,6 +49,11 @@ li {
   display: block;
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes rotation {
@@ -62,4 +63,7 @@ li {
   100% {
     transform: rotate(360deg);
   }
+}
+.loader.hidden {
+  display: none;
 }
