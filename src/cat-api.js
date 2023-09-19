@@ -16,8 +16,6 @@ function fetchBreeds(idValue) {
 
     // Создаем опции для выбора породы
     catArr.forEach(({ id, name, image }) => {
-      if (!image) return;
-
       const option = document.createElement('option');
       option.value = id;
       option.innerHTML = name;

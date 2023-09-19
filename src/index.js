@@ -46,7 +46,7 @@ function onChoose(evt) {
   fetchCatByBreed(selectedValue)
     .then(catData => {
       // Генерация разметки и обновление информации о коте
-      const markup = createMarkup(catData);
+      let markup = createMarkup(catData);
       refs.catInfo.innerHTML = markup;
       console.log(catData);
     })
@@ -54,6 +54,9 @@ function onChoose(evt) {
       console.error(error);
       // refs.catInfo.innerHTML = 'Выбранная порода недоступна.';
       Notiflix.Notify.info('Выбранная порода недоступна.');
+
+      //  отчистить результат прерыдуго запроса
+      markup = '';
     })
     .finally(response => {
       // refs.loader.hidden = true; // Скрываем loader после запроса
