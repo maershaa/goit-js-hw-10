@@ -56,7 +56,7 @@ function onChoose(evt) {
       Notiflix.Notify.info('Выбранная порода недоступна.');
 
       //  отчистить результат прерыдуго запроса
-      markup = '';
+      refs.catInfo.innerHTML = '';
     })
     .finally(response => {
       // refs.loader.hidden = true; // Скрываем loader после запроса
